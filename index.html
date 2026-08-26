@@ -234,7 +234,6 @@
             opacity: 1;
         }
 
-        /* ===== WIDGET MÉTÉO ===== */
         .weather-widget {
             background: linear-gradient(135deg, #f7fafc, #edf2f7);
             border-radius: 12px;
@@ -315,22 +314,6 @@
             color: #fc8181;
         }
 
-        .weather-spinner {
-            display: inline-block;
-            width: 18px;
-            height: 18px;
-            border: 2px solid #e2e8f0;
-            border-top: 2px solid #667eea;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
         .button-group {
             display: flex;
             gap: 12px;
@@ -382,12 +365,6 @@
             transform: translateY(-2px);
             box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
             color: white !important;
-        }
-
-        .whatsapp-link:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
         }
 
         #resetBtn {
@@ -604,7 +581,6 @@
             <span class="badge">💬 WhatsApp & 🌤️ Météo</span>
         </div>
 
-        <!-- ===== WIDGET MÉTÉO ===== -->
         <div class="weather-widget" id="weatherWidget">
             <div class="weather-left">
                 <span class="weather-icon-big" id="weatherIcon">🌍</span>
@@ -719,9 +695,6 @@
         </div>
     </div>
 
-    <!-- ============================================================
-    JAVASCRIPT
-    ============================================================ -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
@@ -729,13 +702,13 @@
             // 🔧 CONFIGURATION
             // ============================================================
 
-            // 🌤️ API MÉTÉO - Clé OpenWeatherMap
+            // 🌤️ API MÉTÉO - OpenWeatherMap
             const WEATHER_API_KEY = '870467eb18c58d3f67b0471f31f388d8';
             const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
-            // 📊 GOOGLE SHEETS - Ton lien Apps Script
+            // 📊 GOOGLE SHEETS - Ton nouveau lien
             const GOOGLE_SHEETS_URL =
-                'https://script.google.com/macros/s/AKfycbzGAjfxHRw7NfBrhVgMhfxhmB6kcAhrhAtNi49uxwK0eDKz5MNFxF1EdYy2zO3OMQmb/exec';
+                'https://script.google.com/macros/s/AKfycbzrQTxo9-lczfPa6xjGeZ_Cjba2PtOYdMblEzr-jm6vGZbAVYooApnp7_ys8H_MBeQf/exec';
 
             // 📱 Numéro WhatsApp par défaut (Burundi)
             const DEFAULT_PHONE = '25777566714';
@@ -760,7 +733,6 @@
             const progressFill = document.getElementById('progressFill');
             const progressBar = document.getElementById('progressBar');
 
-            // Éléments météo
             const weatherWidget = document.getElementById('weatherWidget');
             const weatherIcon = document.getElementById('weatherIcon');
             const weatherTemp = document.getElementById('weatherTemp');
@@ -920,7 +892,7 @@
             }
 
             // ============================================================
-            // 💬 WHATSAPP - Lien direct
+            // 💬 WHATSAPP
             // ============================================================
             function updateWhatsAppLink() {
                 const telephone = telephoneInput.value.trim() || DEFAULT_PHONE;
@@ -961,7 +933,7 @@
             }
 
             // ============================================================
-            // 📊 GOOGLE SHEETS - ENVOI DES DONNÉES
+            // 📊 GOOGLE SHEETS
             // ============================================================
             async function sendToGoogleSheets(data) {
                 try {
@@ -975,7 +947,7 @@
                     });
 
                     // Avec mode: 'no-cors', on ne peut pas lire la réponse
-                    // On considère que c'est un succès si la requête est envoyée
+                    // On considère que c'est un succès
                     return true;
                 } catch (error) {
                     console.error('Erreur Google Sheets:', error);
@@ -1130,7 +1102,7 @@
             });
 
             // ============================================================
-            // SUBMIT - ENVOI VERS GOOGLE SHEETS + WHATSAPP
+            // SUBMIT
             // ============================================================
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1160,7 +1132,6 @@
                 }
                 const weatherText = formatWeatherText(weatherData);
 
-                // Affichage des données
                 document.getElementById('displayNom').textContent = nom;
                 document.getElementById('displayEmail').textContent = email;
                 document.getElementById('displayTel').textContent = telephone;
@@ -1178,7 +1149,7 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Envoi...';
 
-                // === 1. ENVOI VERS GOOGLE SHEETS ===
+                // === 1. GOOGLE SHEETS ===
                 const sheetsData = {
                     nom: nom,
                     email: email,
@@ -1191,13 +1162,12 @@
 
                 const sheetsResult = await sendToGoogleSheets(sheetsData);
 
-                // === 2. MISE À JOUR DU LIEN WHATSAPP ===
+                // === 2. WHATSAPP ===
                 const whatsappUrl = updateWhatsAppLink();
 
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✉️ Envoyer';
 
-                // === 3. AFFICHAGE DES RÉSULTATS ===
                 const sheetsEl = document.getElementById('displaySheets');
                 const whatsappEl = document.getElementById('displayWhatsapp');
 
@@ -1227,7 +1197,7 @@
             });
 
             // ============================================================
-            // CLIC SUR LE LIEN WHATSAPP
+            // WHATSAPP LINK CLICK
             // ============================================================
             whatsappLink.addEventListener('click', function(e) {
                 if (!this.href || this.href === '#') {
@@ -1241,7 +1211,7 @@
             });
 
             // ============================================================
-            // RÉINITIALISATION
+            // RESET
             // ============================================================
             resetBtn.addEventListener('click', function() {
                 clientData.classList.remove('show');
@@ -1269,7 +1239,7 @@
             });
 
             // ============================================================
-            // INITIALISATION
+            // INIT
             // ============================================================
             updateProgress();
 
