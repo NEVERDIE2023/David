@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulaire Client - WhatsApp & Météo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            padding: 40px;
+            border-radius: 24px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.3),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            width: 100%;
+            max-width: 550px;
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header .icon {
+            font-size: 48px;
+            display: block;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .header h1 {
+            font-size: 28px;
+            color: #1a1a2e;
+            font-weight: 700;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+            font-size: 11px;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 14px;
+            color: #2d3748;
+            margin-bottom: 6px;
+        }
+
+        .form-group label .required {
+            color: #e53e3e;
+            margin-left: 2px;
+        }
+
+        .form-group .input-wrapper {
+            position: relative;
+        }
+
+        .form-group .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+            font-size: 18px;
+            transition: color 0.3s;
+            pointer-events: none;
+        }
+
+        .form-group textarea~.input-icon {
+            top: 18px;
+            transform: none;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            background: #f7fafc;
+            color: #2d3748;
+        }
+
+        .form-group textarea {
+            padding-left: 46px;
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+        }
+
+        .form-group input:focus~.input-icon,
+        .form-group textarea:focus~.input-icon {
+            color: #667eea;
+        }
+
+        .error-message {
+            color: #e53e3e;
+            font-size: 12px;
+            display: none;
+            margin-top: 4px;
+            padding-left: 4px;
+            font-weight: 500;
+        }
+
+        .error-message.visible {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+            25% {
+                transform: translateX(-6px);
+            }
+            75% {
+                transform: translateX(6px);
+            }
+        }
+
+        .form-group input.error,
+        .form-group textarea.error {
+            border-color: #e53e3e;
+            background: #fff5f5;
+            box-shadow: 0 0 0 4px rgba(229, 62, 62, 0.1);
+        }
+
+        .form-group input.success,
+        .form-group textarea.success {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+
+        .form-group .success-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #48bb78;
+            font-size: 18px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+
+        .form-group input.success~.success-icon,
+        .form-group textarea.success~.success-icon {
+            opacity: 1;
+        }
+
+        /* ===== WIDGET MÉTÉO ===== */
+        .weather-widget {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 12px;
+            padding: 14px 18px;
+            margin-bottom: 22px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-left: 4px solid #667eea;
+            min-height: 60px;
+            transition: all 0.3s ease;
+        }
+
+        .weather-widget.loading {
+            opacity: 0.6;
+            border-left-color: #ed8936;
+        }
+
+        .weather-widget .weather-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .weather-widget .weather-icon-big {
+            font-size: 32px;
+            animation: none;
+        }
+
+        .weather-widget .weather-icon-big.animated {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .weather-widget .weather-temp {
+            font-size: 22px;
+            font-weight: 700;
+            color: #2d3748;
+        }
+
+        .weather-widget .weather-desc {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .weather-widget .weather-city-name {
+            font-size: 12px;
+            color: #a0aec0;
+        }
+
+        .weather-widget .weather-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .weather-widget .weather-humidity {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .weather-widget .weather-wind {
+            font-size: 12px;
+            color: #718096;
+        }
+
+        .weather-widget .weather-status {
+            font-size: 12px;
+            color: #a0aec0;
+            font-weight: 500;
+        }
+
+        .weather-widget .weather-status.success {
+            color: #48bb78;
+        }
+
+        .weather-widget .weather-status.error {
+            color: #fc8181;
+        }
+
+        .weather-spinner {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #e2e8f0;
+            border-top: 2px solid #667eea;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .button-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        .button-group button,
+        .button-group a {
+            flex: 1;
+            padding: 14px 24px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        #submitBtn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #submitBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.5);
+        }
+
+        #submitBtn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .whatsapp-link {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white !important;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+        }
+
+        .whatsapp-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(37, 211, 102, 0.4);
+            color: white !important;
+        }
+
+        .whatsapp-link:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        #resetBtn {
+            background: #edf2f7;
+            color: #4a5568;
+        }
+
+        #resetBtn:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
+        #clientData {
+            margin-top: 25px;
+            padding: 20px;
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            border-radius: 16px;
+            border-left: 5px solid #667eea;
+            animation: slideUp 0.5s ease;
+            display: none;
+        }
+
+        #clientData.show {
+            display: block;
+        }
+
+        #clientData h2 {
+            font-size: 17px;
+            color: #1a1a2e;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #clientData h2::before {
+            content: '✅';
+        }
+
+        #clientData .data-grid {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 6px 16px;
+        }
+
+        #clientData .data-label {
+            font-weight: 600;
+            color: #4a5568;
+            font-size: 14px;
+        }
+
+        #clientData .data-value {
+            color: #2d3748;
+            word-break: break-word;
+            font-size: 14px;
+        }
+
+        #clientData .data-value.success {
+            color: #48bb78;
+        }
+
+        #clientData .data-value.warning {
+            color: #ed8936;
+        }
+
+        #clientData .data-value.error {
+            color: #e53e3e;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin-top: 18px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .progress-bar.active {
+            opacity: 1;
+        }
+
+        .progress-bar .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 14px 22px;
+            border-radius: 12px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, #48bb78, #38a169);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, #fc8181, #e53e3e);
+        }
+
+        .toast.whatsapp {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+        }
+
+        .toast .toast-close {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+            margin-left: auto;
+        }
+
+        .toast .toast-close:hover {
+            opacity: 1;
+        }
+
+        @media (max-width: 600px) {
+            .container {
+                padding: 25px 18px;
+                border-radius: 16px;
+            }
+
+            .header h1 {
+                font-size: 22px;
+            }
+
+            .button-group {
+                flex-direction: column;
+            }
+
+            .button-group button,
+            .button-group a {
+                padding: 14px;
+            }
+
+            .form-group input,
+            .form-group textarea {
+                padding: 12px 14px 12px 40px;
+                font-size: 14px;
+            }
+
+            .toast {
+                bottom: 20px;
+                right: 20px;
+                left: 20px;
+                font-size: 13px;
+                padding: 12px 16px;
+            }
+
+            .weather-widget {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+
+            .weather-widget .weather-right {
+                flex-direction: row;
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 18px 12px;
+            }
+
+            .header .icon {
+                font-size: 36px;
+            }
+
+            .header h1 {
+                font-size: 19px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast" id="toast">
+        <span id="toastMessage">Message</span>
+        <span class="toast-close" onclick="hideToast()">✕</span>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <span class="icon">👤</span>
+            <h1>Formulaire Client</h1>
+            <p>Remplissez les champs ci-dessous</p>
+            <span class="badge">💬 WhatsApp & 🌤️ Météo</span>
+        </div>
+
+        <!-- ===== WIDGET MÉTÉO ===== -->
+        <div class="weather-widget" id="weatherWidget">
+            <div class="weather-left">
+                <span class="weather-icon-big" id="weatherIcon">🌍</span>
+                <div>
+                    <div class="weather-temp" id="weatherTemp">--°C</div>
+                    <div class="weather-desc" id="weatherDesc">Entrez une ville</div>
+                    <div class="weather-city-name" id="weatherCity">📍 --</div>
+                </div>
+            </div>
+            <div class="weather-right">
+                <div class="weather-humidity" id="weatherHumidity">💧 --%</div>
+                <div class="weather-wind" id="weatherWind">💨 -- km/h</div>
+                <div class="weather-status" id="weatherStatus">🌤️ Météo</div>
+            </div>
+        </div>
+
+        <form id="clientForm" novalidate>
+            <div class="form-group">
+                <label for="nom">
+                    Nom complet
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="nom" placeholder="Ex: Dupont Jean" required>
+                    <span class="success-icon">✓</span>
+                </div>
+                <small class="error-message" id="nomError">Veuillez saisir un nom valide (2-50 caractères)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="email">
+                    Adresse email
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon">✉️</span>
+                    <input type="email" id="email" placeholder="Ex: client@email.com" required>
+                    <span class="success-icon">✓</span>
+                </div>
+                <small class="error-message" id="emailError">Veuillez saisir une adresse email valide</small>
+            </div>
+
+            <div class="form-group">
+                <label for="telephone">
+                    Numéro de téléphone
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon">📞</span>
+                    <input type="text" id="telephone" placeholder="Ex: 77566714" required>
+                    <span class="success-icon">✓</span>
+                </div>
+                <small class="error-message" id="telError">Numéro invalide (ex: 77566714)</small>
+            </div>
+
+            <div class="form-group">
+                <label for="ville">
+                    Ville
+                    <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                    <span class="input-icon">📍</span>
+                    <input type="text" id="ville" placeholder="Ex: Dakar, Paris, Bujumbura..." required>
+                    <span class="success-icon">✓</span>
+                </div>
+                <small class="error-message" id="villeError">Veuillez saisir une ville valide</small>
+            </div>
+
+            <div class="form-group">
+                <label for="message">Message</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">💬</span>
+                    <textarea id="message" rows="4" placeholder="Votre message..."></textarea>
+                    <span class="success-icon" style="top:18px; transform:none;">✓</span>
+                </div>
+            </div>
+
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+
+            <div class="button-group">
+                <button type="submit" id="submitBtn">✉️ Envoyer</button>
+                <a href="#" class="whatsapp-link" id="whatsappLink" target="_blank">
+                    💬 WhatsApp
+                </a>
+                <button type="reset" id="resetBtn">🗑️ Effacer</button>
+            </div>
+        </form>
+
+        <div id="clientData">
+            <h2>Données enregistrées</h2>
+            <div class="data-grid">
+                <span class="data-label">👤 Nom :</span>
+                <span class="data-value" id="displayNom"></span>
+                <span class="data-label">✉️ Email :</span>
+                <span class="data-value" id="displayEmail"></span>
+                <span class="data-label">📞 Téléphone :</span>
+                <span class="data-value" id="displayTel"></span>
+                <span class="data-label">📍 Ville :</span>
+                <span class="data-value" id="displayVille"></span>
+                <span class="data-label">🌤️ Météo :</span>
+                <span class="data-value" id="displayWeather"></span>
+                <span class="data-label">💬 WhatsApp :</span>
+                <span class="data-value" id="displayWhatsapp"></span>
+                <span class="data-label">💬 Message :</span>
+                <span class="data-value" id="displayMessage"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            // ============================================================
+            // 🔧 CONFIGURATION
+            // ============================================================
+
+            // 🌤️ API MÉTÉO - Mets TA clé ici
+            const WEATHER_API_KEY = '870467eb18c58d3f67b0471f31f388d8';
+            const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
+
+            // 📊 Google Sheets - Remplace par ton URL
+            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/VOTRE_ID_ICI/exec';
+
+            // 📱 Numéro WhatsApp par défaut (Burundi)
+            const DEFAULT_PHONE = '25777566714';
+
+            // ============================================================
+            // ÉLÉMENTS
+            // ============================================================
+            const form = document.getElementById('clientForm');
+            const nomInput = document.getElementById('nom');
+            const emailInput = document.getElementById('email');
+            const telephoneInput = document.getElementById('telephone');
+            const villeInput = document.getElementById('ville');
+            const messageInput = document.getElementById('message');
+            const nomError = document.getElementById('nomError');
+            const emailError = document.getElementById('emailError');
+            const telError = document.getElementById('telError');
+            const villeError = document.getElementById('villeError');
+            const clientData = document.getElementById('clientData');
+            const submitBtn = document.getElementById('submitBtn');
+            const whatsappLink = document.getElementById('whatsappLink');
+            const resetBtn = document.getElementById('resetBtn');
+            const progressFill = document.getElementById('progressFill');
+            const progressBar = document.getElementById('progressBar');
+
+            // Éléments météo
+            const weatherWidget = document.getElementById('weatherWidget');
+            const weatherIcon = document.getElementById('weatherIcon');
+            const weatherTemp = document.getElementById('weatherTemp');
+            const weatherDesc = document.getElementById('weatherDesc');
+            const weatherCity = document.getElementById('weatherCity');
+            const weatherHumidity = document.getElementById('weatherHumidity');
+            const weatherWind = document.getElementById('weatherWind');
+            const weatherStatus = document.getElementById('weatherStatus');
+
+            let currentWeather = null;
+            let isWeatherLoading = false;
+
+            // ============================================================
+            // TOAST
+            // ============================================================
+            function showToast(message, type = 'success') {
+                const toast = document.getElementById('toast');
+                const toastMessage = document.getElementById('toastMessage');
+                toast.className = 'toast ' + type;
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+                clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+            }
+
+            window.hideToast = function() {
+                document.getElementById('toast').classList.remove('show');
+            };
+
+            // ============================================================
+            // 🌤️ API MÉTÉO
+            // ============================================================
+            async function getWeather(city) {
+                if (!city || city.trim().length < 2) {
+                    weatherStatus.textContent = '📍 Entrez une ville';
+                    weatherStatus.className = 'weather-status';
+                    return null;
+                }
+
+                if (isWeatherLoading) return currentWeather;
+
+                isWeatherLoading = true;
+                weatherWidget.classList.add('loading');
+                weatherStatus.textContent = '⏳ Chargement...';
+                weatherStatus.className = 'weather-status';
+                weatherIcon.textContent = '⏳';
+                weatherIcon.className = 'weather-icon-big';
+                weatherTemp.textContent = '--°C';
+                weatherDesc.textContent = 'Recherche...';
+                weatherCity.textContent = `📍 ${city}`;
+                weatherHumidity.textContent = '💧 --%';
+                weatherWind.textContent = '💨 -- km/h';
+
+                try {
+                    const url =
+                        `${WEATHER_API_URL}?q=${encodeURIComponent(city)}&units=metric&lang=fr&appid=${WEATHER_API_KEY}`;
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        if (response.status === 401) {
+                            weatherStatus.textContent = '❌ Clé API invalide';
+                            weatherStatus.className = 'weather-status error';
+                            weatherIcon.textContent = '🔑';
+                            weatherDesc.textContent = 'Vérifie ta clé API';
+                            isWeatherLoading = false;
+                            weatherWidget.classList.remove('loading');
+                            return null;
+                        }
+                        if (response.status === 404) {
+                            weatherStatus.textContent = '❌ Ville non trouvée';
+                            weatherStatus.className = 'weather-status error';
+                            weatherIcon.textContent = '❌';
+                            weatherDesc.textContent = 'Ville inconnue';
+                            isWeatherLoading = false;
+                            weatherWidget.classList.remove('loading');
+                            return null;
+                        }
+                        throw new Error('Erreur API');
+                    }
+
+                    const data = await response.json();
+
+                    // Emojis météo
+                    const emojis = {
+                        'Clear': '☀️',
+                        'Clouds': '☁️',
+                        'Rain': '🌧️',
+                        'Drizzle': '🌦️',
+                        'Thunderstorm': '⛈️',
+                        'Snow': '❄️',
+                        'Mist': '🌫️',
+                        'Fog': '🌫️',
+                        'Smoke': '💨',
+                        'Haze': '🌫️',
+                        'Dust': '🌪️',
+                        'Sand': '🏜️',
+                        'Ash': '🌋',
+                        'Squall': '🌬️',
+                        'Tornado': '🌪️'
+                    };
+
+                    const condition = data.weather[0].main;
+                    const emoji = emojis[condition] || '🌍';
+
+                    // Mise à jour UI
+                    weatherIcon.textContent = emoji;
+                    weatherIcon.className = 'weather-icon-big animated';
+                    weatherTemp.textContent = `${Math.round(data.main.temp)}°C`;
+                    weatherDesc.textContent = data.weather[0].description;
+                    weatherCity.textContent = `📍 ${data.name}, ${data.sys.country}`;
+                    weatherHumidity.textContent = `💧 ${data.main.humidity}%`;
+                    weatherWind.textContent = `💨 ${Math.round(data.wind.speed * 3.6)} km/h`;
+                    weatherStatus.textContent = '✅ Météo chargée';
+                    weatherStatus.className = 'weather-status success';
+
+                    currentWeather = data;
+                    isWeatherLoading = false;
+                    weatherWidget.classList.remove('loading');
+
+                    return data;
+
+                } catch (error) {
+                    console.error('Erreur météo:', error);
+                    weatherStatus.textContent = '⚠️ Erreur de connexion';
+                    weatherStatus.className = 'weather-status error';
+                    weatherIcon.textContent = '⚠️';
+                    weatherIcon.className = 'weather-icon-big';
+                    weatherDesc.textContent = 'Vérifie ta connexion';
+                    isWeatherLoading = false;
+                    weatherWidget.classList.remove('loading');
+                    return null;
+                }
+            }
+
+            function formatWeatherText(data) {
+                if (!data || !data.main) return 'Météo non disponible';
+
+                const emojis = {
+                    'Clear': '☀️',
+                    'Clouds': '☁️',
+                    'Rain': '🌧️',
+                    'Drizzle': '🌦️',
+                    'Thunderstorm': '⛈️',
+                    'Snow': '❄️',
+                    'Mist': '🌫️',
+                    'Fog': '🌫️',
+                    'Smoke': '💨',
+                    'Haze': '🌫️',
+                    'Dust': '🌪️',
+                    'Sand': '🏜️',
+                    'Ash': '🌋',
+                    'Squall': '🌬️',
+                    'Tornado': '🌪️'
+                };
+
+                const condition = data.weather[0].main;
+                const emoji = emojis[condition] || '🌍';
+                return `${emoji} ${Math.round(data.main.temp)}°C, ${data.weather[0].description}`;
+            }
+
+            // ============================================================
+            // 💬 WHATSAPP - Lien direct
+            // ============================================================
+            function updateWhatsAppLink() {
+                const telephone = telephoneInput.value.trim() || DEFAULT_PHONE;
+                const nom = nomInput.value.trim() || 'Client';
+                const email = emailInput.value.trim() || 'Non renseigné';
+                const ville = villeInput.value.trim() || 'Non renseignée';
+                const message = messageInput.value.trim() || 'Aucun message';
+                const weatherText = formatWeatherText(currentWeather);
+
+                // Nettoyer le numéro
+                let cleanNumber = telephone.replace(/[^0-9+]/g, '');
+
+                // Si le numéro commence par 0, remplacer par 257 (Burundi)
+                if (cleanNumber.startsWith('0') && cleanNumber.length === 9) {
+                    cleanNumber = '257' + cleanNumber.substring(1);
+                }
+
+                // Si le numéro ne contient pas de code pays, ajouter 257
+                if (!cleanNumber.startsWith('+') && !cleanNumber.startsWith('257')) {
+                    cleanNumber = '257' + cleanNumber;
+                }
+
+                // Ajouter + si absent
+                if (!cleanNumber.startsWith('+')) {
+                    cleanNumber = '+' + cleanNumber;
+                }
+
+                // Construire le message WhatsApp
+                const whatsappMsg = `📋 *Nouveau client*
+
+        👤 Nom: ${nom}
+        ✉️ Email: ${email}
+        📞 Téléphone: ${telephone}
+        📍 Ville: ${ville}
+        🌤️ Météo: ${weatherText}
+        💬 Message: ${message}
+        📅 Date: ${new Date().toLocaleString('fr-FR')}`;
+
+                // Créer le lien WhatsApp
+                const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(whatsappMsg)}`;
+                whatsappLink.href = url;
+
+                return url;
+            }
+
+            // ============================================================
+            // 📊 GOOGLE SHEETS
+            // ============================================================
+            async function sendToGoogleSheets(data) {
+                try {
+                    await fetch(GOOGLE_SHEETS_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(data)
+                    });
+                    return true;
+                } catch (error) {
+                    console.error('Erreur Google Sheets:', error);
+                    return false;
+                }
+            }
+
+            // ============================================================
+            // VALIDATION
+            // ============================================================
+            function validerNom() {
+                const valeur = nomInput.value.trim();
+                if (valeur.length < 2 || valeur.length > 50 || !/^[a-zA-Z\s\-']+$/.test(valeur)) {
+                    nomInput.classList.add('error');
+                    nomInput.classList.remove('success');
+                    nomError.classList.add('visible');
+                    return false;
+                } else {
+                    nomInput.classList.remove('error');
+                    nomInput.classList.add('success');
+                    nomError.classList.remove('visible');
+                    return true;
+                }
+            }
+
+            function validerEmail() {
+                const valeur = emailInput.value.trim();
+                const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                if (!regex.test(valeur)) {
+                    emailInput.classList.add('error');
+                    emailInput.classList.remove('success');
+                    emailError.classList.add('visible');
+                    return false;
+                } else {
+                    emailInput.classList.remove('error');
+                    emailInput.classList.add('success');
+                    emailError.classList.remove('visible');
+                    return true;
+                }
+            }
+
+            function validerTelephone() {
+                const valeur = telephoneInput.value.trim();
+                const clean = valeur.replace(/[^0-9+]/g, '');
+
+                if (!clean || clean.length < 8) {
+                    telephoneInput.classList.add('error');
+                    telephoneInput.classList.remove('success');
+                    telError.classList.add('visible');
+                    telError.textContent = 'Numéro requis (ex: 77566714)';
+                    return false;
+                }
+
+                if (clean.length > 15) {
+                    telephoneInput.classList.add('error');
+                    telephoneInput.classList.remove('success');
+                    telError.classList.add('visible');
+                    telError.textContent = 'Numéro trop long (max 15 chiffres)';
+                    return false;
+                }
+
+                telephoneInput.classList.remove('error');
+                telephoneInput.classList.add('success');
+                telError.classList.remove('visible');
+                return true;
+            }
+
+            function validerVille() {
+                const valeur = villeInput.value.trim();
+                if (valeur.length < 2) {
+                    villeInput.classList.add('error');
+                    villeInput.classList.remove('success');
+                    villeError.classList.add('visible');
+                    return false;
+                } else {
+                    villeInput.classList.remove('error');
+                    villeInput.classList.add('success');
+                    villeError.classList.remove('visible');
+                    return true;
+                }
+            }
+
+            function validerMessage() {
+                const valeur = messageInput.value.trim();
+                if (valeur && valeur.length < 2) {
+                    messageInput.classList.add('error');
+                    messageInput.classList.remove('success');
+                    return false;
+                } else if (valeur) {
+                    messageInput.classList.remove('error');
+                    messageInput.classList.add('success');
+                    return true;
+                } else {
+                    messageInput.classList.remove('error');
+                    messageInput.classList.remove('success');
+                    return true;
+                }
+            }
+
+            // ============================================================
+            // PROGRESSION
+            // ============================================================
+            function updateProgress() {
+                const fields = [
+                    nomInput.value.trim().length >= 2,
+                    emailInput.value.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailInput.value.trim()),
+                    telephoneInput.value.trim().replace(/[^0-9+]/g, '').length >= 8,
+                    villeInput.value.trim().length >= 2,
+                    !messageInput.value.trim() || messageInput.value.trim().length >= 2
+                ];
+                const filled = fields.filter(Boolean).length;
+                const total = fields.length;
+                const percent = Math.round((filled / total) * 100);
+                progressFill.style.width = percent + '%';
+                progressBar.classList.add('active');
+                if (percent === 100) {
+                    progressFill.style.background = 'linear-gradient(90deg, #48bb78, #38a169)';
+                } else {
+                    progressFill.style.background = 'linear-gradient(90deg, #667eea, #764ba2)';
+                }
+            }
+
+            // ============================================================
+            // ÉVÉNEMENTS
+            // ============================================================
+            nomInput.addEventListener('input', () => { validerNom();
+                updateProgress();
+                updateWhatsAppLink(); });
+            emailInput.addEventListener('input', () => { validerEmail();
+                updateProgress();
+                updateWhatsAppLink(); });
+            telephoneInput.addEventListener('input', () => { validerTelephone();
+                updateProgress();
+                updateWhatsAppLink(); });
+            villeInput.addEventListener('input', () => { validerVille();
+                updateProgress();
+                updateWhatsAppLink(); });
+            messageInput.addEventListener('input', () => { validerMessage();
+                updateProgress();
+                updateWhatsAppLink(); });
+
+            // Météo automatique quand la ville change
+            let weatherTimeout = null;
+            villeInput.addEventListener('input', function() {
+                clearTimeout(weatherTimeout);
+                const city = this.value.trim();
+                if (city.length >= 2) {
+                    weatherTimeout = setTimeout(async () => {
+                        await getWeather(city);
+                        updateWhatsAppLink();
+                    }, 800);
+                }
+            });
+
+            // ============================================================
+            // SUBMIT
+            // ============================================================
+            form.addEventListener('submit', async function(e) {
+                e.preventDefault();
+
+                const nomOk = validerNom();
+                const emailOk = validerEmail();
+                const telOk = validerTelephone();
+                const villeOk = validerVille();
+                const msgOk = validerMessage();
+
+                if (!nomOk || !emailOk || !telOk || !villeOk || !msgOk) {
+                    showToast('❌ Veuillez corriger les erreurs', 'error');
+                    const firstError = document.querySelector('.form-group input.error, .form-group textarea.error');
+                    if (firstError) firstError.focus();
+                    return;
+                }
+
+                const nom = nomInput.value.trim();
+                const email = emailInput.value.trim();
+                const telephone = telephoneInput.value.trim();
+                const ville = villeInput.value.trim();
+                const message = messageInput.value.trim() || 'Aucun message';
+
+                // Récupérer la météo si pas déjà faite
+                let weatherData = currentWeather;
+                if (!weatherData || weatherData.name.toLowerCase() !== ville.toLowerCase()) {
+                    weatherData = await getWeather(ville);
+                }
+                const weatherText = formatWeatherText(weatherData);
+
+                // Affichage
+                document.getElementById('displayNom').textContent = nom;
+                document.getElementById('displayEmail').textContent = email;
+                document.getElementById('displayTel').textContent = telephone;
+                document.getElementById('displayVille').textContent = ville;
+                document.getElementById('displayWeather').textContent = weatherText;
+                document.getElementById('displayMessage').textContent = message;
+                document.getElementById('displayWhatsapp').textContent = '⏳ Envoi...';
+                document.getElementById('displayWhatsapp').className = 'data-value';
+
+                clientData.classList.add('show');
+                clientData.style.display = 'block';
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Envoi...';
+
+                // === 1. GOOGLE SHEETS ===
+                const sheetsResult = await sendToGoogleSheets({
+                    nom: nom,
+                    email: email,
+                    telephone: telephone,
+                    ville: ville,
+                    message: message,
+                    meteo: weatherText,
+                    date: new Date().toLocaleString('fr-FR')
+                });
+
+                // === 2. WHATSAPP ===
+                const whatsappUrl = updateWhatsAppLink();
+
+                submitBtn.disabled = false;
+                submitBtn.textContent = '✉️ Envoyer';
+
+                const whatsappEl = document.getElementById('displayWhatsapp');
+
+                if (sheetsResult) {
+                    whatsappEl.textContent = '✅ Lien WhatsApp généré';
+                    whatsappEl.className = 'data-value success';
+                    showToast('✅ Données envoyées vers Google Sheets !', 'success');
+                } else {
+                    whatsappEl.textContent = '⚠️ Sheets échoué, WhatsApp disponible';
+                    whatsappEl.className = 'data-value warning';
+                    showToast('⚠️ Sheets échoué, mais WhatsApp fonctionne', 'error');
+                }
+
+                // Ouvrir WhatsApp automatiquement
+                if (whatsappUrl && whatsappUrl.includes('wa.me')) {
+                    setTimeout(() => {
+                        window.open(whatsappUrl, '_blank');
+                        showToast('💬 WhatsApp ouvert !', 'whatsapp');
+                    }, 500);
+                }
+
+                clientData.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            });
+
+            // ============================================================
+            // CLIC SUR LE LIEN WHATSAPP
+            // ============================================================
+            whatsappLink.addEventListener('click', function(e) {
+                if (!this.href || this.href === '#') {
+                    e.preventDefault();
+                    showToast('❌ Remplissez d\'abord le formulaire', 'error');
+                    return;
+                }
+                setTimeout(() => {
+                    showToast('💬 WhatsApp ouvert !', 'whatsapp');
+                }, 500);
+            });
+
+            // ============================================================
+            // RÉINITIALISATION
+            // ============================================================
+            resetBtn.addEventListener('click', function() {
+                clientData.classList.remove('show');
+                clientData.style.display = 'none';
+                document.querySelectorAll('.error').forEach(el => el.classList.remove('error'));
+                document.querySelectorAll('.success').forEach(el => el.classList.remove('success'));
+                document.querySelectorAll('.error-message.visible').forEach(el => el.classList.remove('visible'));
+                progressFill.style.width = '0%';
+                progressBar.classList.remove('active');
+                submitBtn.textContent = '✉️ Envoyer';
+                submitBtn.disabled = false;
+                currentWeather = null;
+                weatherIcon.textContent = '🌍';
+                weatherIcon.className = 'weather-icon-big';
+                weatherTemp.textContent = '--°C';
+                weatherDesc.textContent = 'Entrez une ville';
+                weatherCity.textContent = '📍 --';
+                weatherHumidity.textContent = '💧 --%';
+                weatherWind.textContent = '💨 -- km/h';
+                weatherStatus.textContent = '🌤️ Météo';
+                weatherStatus.className = 'weather-status';
+                weatherWidget.classList.remove('loading');
+                whatsappLink.href = '#';
+                showToast('🗑️ Réinitialisé', 'success');
+            });
+
+            // ============================================================
+            // INIT
+            // ============================================================
+            updateProgress();
+
+            // Météo par défaut sur Bujumbura
+            setTimeout(() => {
+                getWeather('Bujumbura');
+            }, 500);
+
+            // Mise à jour initiale du lien WhatsApp
+            setTimeout(updateWhatsAppLink, 1000);
+
+        });
+    </script>
+
+</body>
+</html>

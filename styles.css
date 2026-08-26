@@ -1,0 +1,218 @@
+/* ==============================
+   RÉINITIALISATION
+================================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* ==============================
+   CORPS DE LA PAGE
+================================= */
+
+body {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: linear-gradient(135deg, #e3f2fd, #f8f9fa);
+    min-height: 100vh;
+    padding: 50px 20px;
+    color: #333;
+}
+
+
+/* ==============================
+   CONTENEUR PRINCIPAL
+================================= */
+
+.container {
+    max-width: 1000px;
+    margin: auto;
+    background: #ffffff;
+    padding: 40px;
+    border-radius: 18px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+}
+
+
+/* ==============================
+   TITRES
+================================= */
+
+h1 {
+    text-align: center;
+    color: #0d47a1;
+    font-size: 32px;
+    margin-bottom: 35px;
+}
+
+h2 {
+    color: #333;
+    font-size: 22px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    border-left: 5px solid #1976d2;
+    padding-left: 12px;
+}
+
+
+/* ==============================
+   FORMULAIRE
+================================= */
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #444;
+    font-size: 15px;
+}
+
+
+/* ==============================
+   CHAMPS INPUT
+================================= */
+
+input {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #d0d7de;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.3s ease;
+    background-color: #fafafa;
+}
+
+input::placeholder {
+    color: #999;
+}
+
+input:focus {
+    border-color: #1976d2;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.12);
+}
+
+
+/* ==============================
+   BOUTON
+================================= */
+
+button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 10px;
+    background: linear-gradient(135deg, #1976d2, #0d47a1);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(13, 71, 161, 0.3);
+}
+
+button:active {
+    transform: translateY(0);
+}
+
+
+/* ==============================
+   MESSAGE
+================================= */
+
+#message {
+    margin-top: 18px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+
+/* ==============================
+   TABLEAU
+================================= */
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow: hidden;
+    border-radius: 10px;
+    background: white;
+}
+
+thead {
+    background: linear-gradient(135deg, #1976d2, #0d47a1);
+}
+
+th {
+    color: white;
+    padding: 14px 12px;
+    text-align: left;
+    font-size: 14px;
+}
+
+td {
+    border-bottom: 1px solid #eee;
+    padding: 13px 12px;
+    font-size: 14px;
+}
+
+
+/* ==============================
+   EFFET SUR LES LIGNES
+================================= */
+
+tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+tbody tr:hover {
+    background-color: #f1f7ff;
+}
+
+tbody tr:last-child td {
+    border-bottom: none;
+}
+
+
+/* ==============================
+   RESPONSIVE : TÉLÉPHONE
+================================= */
+
+@media (max-width: 700px) {
+
+    body {
+        padding: 20px 10px;
+    }
+
+    .container {
+        padding: 25px 20px;
+    }
+
+    h1 {
+        font-size: 26px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    th,
+    td {
+        padding: 10px;
+    }
+}
