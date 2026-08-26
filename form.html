@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ajouter un étudiant</title>
+    <title>Formulaire de paiement</title>
 
     <style>
         body {
@@ -47,7 +47,7 @@
             width: 100%;
             margin-top: 25px;
             padding: 12px;
-            background-color: #007bff;
+            background-color: #28a745;
             color: white;
             border: none;
             border-radius: 5px;
@@ -56,7 +56,7 @@
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #218838;
         }
     </style>
 </head>
@@ -65,23 +65,83 @@
 
 <div class="container">
 
-    <h2>Ajouter un étudiant</h2>
+    <h2>Formulaire de paiement</h2>
 
     <form action="#" method="POST">
 
+        <!-- Nom -->
         <label for="nom">Nom</label>
-        <input type="text" id="nom" name="nom" placeholder="Entrez le nom" required>
+        <input 
+            type="text" 
+            id="nom" 
+            name="nom" 
+            placeholder="Entrez le nom" 
+            required
+        >
 
+        <!-- Prénom -->
         <label for="prenom">Prénom</label>
-        <input type="text" id="prenom" name="prenom" placeholder="Entrez le prénom" required>
+        <input 
+            type="text" 
+            id="prenom" 
+            name="prenom" 
+            placeholder="Entrez le prénom" 
+            required
+        >
 
-        <label for="classe">Classe</label>
-        <input type="text" id="classe" name="classe" placeholder="Exemple : Bac 3" required>
+        <!-- Montant -->
+        <label for="montant">Montant</label>
+        <input 
+            type="number" 
+            id="montant" 
+            name="montant" 
+            placeholder="Exemple : 50000" 
+            min="1"
+            required
+        >
 
-        <label for="annee">Année académique</label>
-        <input type="text" id="annee" name="annee" placeholder="Exemple : 2025-2026" required>
+        <!-- Motif -->
+        <label for="motif">Motif du paiement</label>
+        <select id="motif" name="motif" required>
+            <option value="">-- Sélectionnez le motif --</option>
+            <option value="inscription">Frais d'inscription</option>
+            <option value="scolarite">Frais de scolarité</option>
+            <option value="examen">Frais d'examen</option>
+            <option value="bibliotheque">Frais de bibliothèque</option>
+            <option value="autre">Autre</option>
+        </select>
 
-        <button type="submit">Envoyer</button>
+        <!-- Mode de paiement -->
+        <label for="mode">Mode de paiement</label>
+        <select id="mode" name="mode" required>
+            <option value="">-- Sélectionnez le mode --</option>
+            <option value="lumicash">Lumicash</option>
+            <option value="ecocash">EcoCash</option>
+            <option value="banque">Virement bancaire</option>
+            <option value="especes">Espèces</option>
+        </select>
+
+        <!-- Téléphone -->
+        <label for="telephone">Numéro de téléphone</label>
+        <input 
+            type="tel" 
+            id="telephone" 
+            name="telephone" 
+            placeholder="Exemple : 79 123 456" 
+            required
+        >
+
+        <!-- Date -->
+        <label for="date">Date du paiement</label>
+        <input 
+            type="date" 
+            id="date" 
+            name="date" 
+            required
+        >
+
+        <!-- Bouton -->
+        <button type="submit">Effectuer le paiement</button>
 
     </form>
 
