@@ -709,6 +709,8 @@
                 <span class="data-value" id="displayVille"></span>
                 <span class="data-label">🌤️ Météo :</span>
                 <span class="data-value" id="displayWeather"></span>
+                <span class="data-label">📊 Google Sheets :</span>
+                <span class="data-value" id="displaySheets"></span>
                 <span class="data-label">💬 WhatsApp :</span>
                 <span class="data-value" id="displayWhatsapp"></span>
                 <span class="data-label">💬 Message :</span>
@@ -727,12 +729,13 @@
             // 🔧 CONFIGURATION
             // ============================================================
 
-            // 🌤️ API MÉTÉO - Mets TA clé ici
+            // 🌤️ API MÉTÉO - Clé OpenWeatherMap
             const WEATHER_API_KEY = '870467eb18c58d3f67b0471f31f388d8';
             const WEATHER_API_URL = 'https://api.openweathermap.org/data/2.5/weather';
 
-            // 📊 Google Sheets - Remplace par ton URL
-            const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/VOTRE_ID_ICI/exec';
+            // 📊 GOOGLE SHEETS - Ton lien Apps Script
+            const GOOGLE_SHEETS_URL =
+                'https://script.google.com/macros/s/AKfycbzGAjfxHRw7NfBrhVgMhfxhmB6kcAhrhAtNi49uxwK0eDKz5MNFxF1EdYy2zO3OMQmb/exec';
 
             // 📱 Numéro WhatsApp par défaut (Burundi)
             const DEFAULT_PHONE = '25777566714';
@@ -840,7 +843,6 @@
 
                     const data = await response.json();
 
-                    // Emojis météo
                     const emojis = {
                         'Clear': '☀️',
                         'Clouds': '☁️',
@@ -862,7 +864,6 @@
                     const condition = data.weather[0].main;
                     const emoji = emojis[condition] || '🌍';
 
-                    // Mise à jour UI
                     weatherIcon.textContent = emoji;
                     weatherIcon.className = 'weather-icon-big animated';
                     weatherTemp.textContent = `${Math.round(data.main.temp)}°C`;
@@ -929,25 +930,20 @@
                 const message = messageInput.value.trim() || 'Aucun message';
                 const weatherText = formatWeatherText(currentWeather);
 
-                // Nettoyer le numéro
                 let cleanNumber = telephone.replace(/[^0-9+]/g, '');
 
-                // Si le numéro commence par 0, remplacer par 257 (Burundi)
                 if (cleanNumber.startsWith('0') && cleanNumber.length === 9) {
                     cleanNumber = '257' + cleanNumber.substring(1);
                 }
 
-                // Si le numéro ne contient pas de code pays, ajouter 257
                 if (!cleanNumber.startsWith('+') && !cleanNumber.startsWith('257')) {
                     cleanNumber = '257' + cleanNumber;
                 }
 
-                // Ajouter + si absent
                 if (!cleanNumber.startsWith('+')) {
                     cleanNumber = '+' + cleanNumber;
                 }
 
-                // Construire le message WhatsApp
                 const whatsappMsg = `📋 *Nouveau client*
 
         👤 Nom: ${nom}
@@ -958,7 +954,6 @@
         💬 Message: ${message}
         📅 Date: ${new Date().toLocaleString('fr-FR')}`;
 
-                // Créer le lien WhatsApp
                 const url = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(whatsappMsg)}`;
                 whatsappLink.href = url;
 
@@ -966,16 +961,21 @@
             }
 
             // ============================================================
-            // 📊 GOOGLE SHEETS
+            // 📊 GOOGLE SHEETS - ENVOI DES DONNÉES
             // ============================================================
             async function sendToGoogleSheets(data) {
                 try {
-                    await fetch(GOOGLE_SHEETS_URL, {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
                         method: 'POST',
                         mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
                         body: JSON.stringify(data)
                     });
+
+                    // Avec mode: 'no-cors', on ne peut pas lire la réponse
+                    // On considère que c'est un succès si la requête est envoyée
                     return true;
                 } catch (error) {
                     console.error('Erreur Google Sheets:', error);
@@ -1117,7 +1117,6 @@
                 updateProgress();
                 updateWhatsAppLink(); });
 
-            // Météo automatique quand la ville change
             let weatherTimeout = null;
             villeInput.addEventListener('input', function() {
                 clearTimeout(weatherTimeout);
@@ -1131,7 +1130,7 @@
             });
 
             // ============================================================
-            // SUBMIT
+            // SUBMIT - ENVOI VERS GOOGLE SHEETS + WHATSAPP
             // ============================================================
             form.addEventListener('submit', async function(e) {
                 e.preventDefault();
@@ -1155,20 +1154,21 @@
                 const ville = villeInput.value.trim();
                 const message = messageInput.value.trim() || 'Aucun message';
 
-                // Récupérer la météo si pas déjà faite
                 let weatherData = currentWeather;
                 if (!weatherData || weatherData.name.toLowerCase() !== ville.toLowerCase()) {
                     weatherData = await getWeather(ville);
                 }
                 const weatherText = formatWeatherText(weatherData);
 
-                // Affichage
+                // Affichage des données
                 document.getElementById('displayNom').textContent = nom;
                 document.getElementById('displayEmail').textContent = email;
                 document.getElementById('displayTel').textContent = telephone;
                 document.getElementById('displayVille').textContent = ville;
                 document.getElementById('displayWeather').textContent = weatherText;
                 document.getElementById('displayMessage').textContent = message;
+                document.getElementById('displaySheets').textContent = '⏳ Envoi...';
+                document.getElementById('displaySheets').className = 'data-value';
                 document.getElementById('displayWhatsapp').textContent = '⏳ Envoi...';
                 document.getElementById('displayWhatsapp').className = 'data-value';
 
@@ -1178,8 +1178,8 @@
                 submitBtn.disabled = true;
                 submitBtn.textContent = '⏳ Envoi...';
 
-                // === 1. GOOGLE SHEETS ===
-                const sheetsResult = await sendToGoogleSheets({
+                // === 1. ENVOI VERS GOOGLE SHEETS ===
+                const sheetsData = {
                     nom: nom,
                     email: email,
                     telephone: telephone,
@@ -1187,32 +1187,40 @@
                     message: message,
                     meteo: weatherText,
                     date: new Date().toLocaleString('fr-FR')
-                });
+                };
 
-                // === 2. WHATSAPP ===
+                const sheetsResult = await sendToGoogleSheets(sheetsData);
+
+                // === 2. MISE À JOUR DU LIEN WHATSAPP ===
                 const whatsappUrl = updateWhatsAppLink();
 
                 submitBtn.disabled = false;
                 submitBtn.textContent = '✉️ Envoyer';
 
+                // === 3. AFFICHAGE DES RÉSULTATS ===
+                const sheetsEl = document.getElementById('displaySheets');
                 const whatsappEl = document.getElementById('displayWhatsapp');
 
                 if (sheetsResult) {
-                    whatsappEl.textContent = '✅ Lien WhatsApp généré';
-                    whatsappEl.className = 'data-value success';
+                    sheetsEl.textContent = '✅ Sauvegardé dans Google Sheets';
+                    sheetsEl.className = 'data-value success';
                     showToast('✅ Données envoyées vers Google Sheets !', 'success');
                 } else {
-                    whatsappEl.textContent = '⚠️ Sheets échoué, WhatsApp disponible';
-                    whatsappEl.className = 'data-value warning';
-                    showToast('⚠️ Sheets échoué, mais WhatsApp fonctionne', 'error');
+                    sheetsEl.textContent = '⚠️ Erreur de sauvegarde';
+                    sheetsEl.className = 'data-value warning';
+                    showToast('⚠️ Erreur Google Sheets', 'error');
                 }
 
-                // Ouvrir WhatsApp automatiquement
                 if (whatsappUrl && whatsappUrl.includes('wa.me')) {
+                    whatsappEl.textContent = '✅ Lien WhatsApp généré';
+                    whatsappEl.className = 'data-value success';
                     setTimeout(() => {
                         window.open(whatsappUrl, '_blank');
                         showToast('💬 WhatsApp ouvert !', 'whatsapp');
                     }, 500);
+                } else {
+                    whatsappEl.textContent = '⚠️ WhatsApp non disponible';
+                    whatsappEl.className = 'data-value warning';
                 }
 
                 clientData.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -1261,16 +1269,14 @@
             });
 
             // ============================================================
-            // INIT
+            // INITIALISATION
             // ============================================================
             updateProgress();
 
-            // Météo par défaut sur Bujumbura
             setTimeout(() => {
                 getWeather('Bujumbura');
             }, 500);
 
-            // Mise à jour initiale du lien WhatsApp
             setTimeout(updateWhatsAppLink, 1000);
 
         });
